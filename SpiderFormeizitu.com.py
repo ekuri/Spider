@@ -78,7 +78,7 @@ while True:
         while True:
             htmlUrl = 'http://www.meizitu.com/a/%s.html' % pageCount
             print 'Trying URL:  ' + htmlUrl
-            logFile.write('Trying URL:  ' + htmlUrl + '\n')
+            logFile.writelines('Trying URL:  ' + htmlUrl + '\n')
         
             singleRun(htmlUrl)
         
