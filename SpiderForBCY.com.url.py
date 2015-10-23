@@ -26,7 +26,7 @@ def getWorkPictures(html, directoryName):
     for pictureUrl in pictureUrls:
         print 'Found picture url: ' + pictureUrl
 
-        pictureNameReg = re.compile(r'/(\w*\.\w*)$')
+        pictureNameReg = re.compile(r'/(\w+\.?\w+)$')
         pictureName = re.findall(pictureNameReg, pictureUrl)[0]
 
         while True:
@@ -35,7 +35,8 @@ def getWorkPictures(html, directoryName):
                 urllib.urlretrieve(pictureUrl, directoryName + '/' + pictureName)
                 break
             except socket.timeout, error:
-                print 'Get socket.timeout exception: ' + error
+                print 'Get socket.timeout exception: ',
+                print error
 
 def getWorkData(url, html):
     directoryName = makeWorkDirectory(url, html)
@@ -92,7 +93,8 @@ def main():
             logFile.write(work)
     except KeyboardInterrupt:
         print 'KeyboardInterrupt, exiting...'
-
+    except:
+        pass
     logFile.close()
 
 if __name__ == "__main__":
