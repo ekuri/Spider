@@ -6,11 +6,8 @@ import os
 import time
 import sys
 
-def getLikeCount(html):
-    likeReg = re.compile(r'<div class="btn btn--pink btn--zan btn--base-border-radius js-zan" data-zan="(\d+?)">')
-    like = re.findall(likeReg, html)
 
-    return like[0]
+targetDirectory = 'get/bcy/'
 
 def getWorkHTML(url):
     baseUrl = 'http://bcy.net'
@@ -45,12 +42,14 @@ def getWorkData(url, html):
     getWorkPictures(html, directoryName)
 
 def makeWorkDirectory(url, html):
-    directoryName = getLikeCount(html)
+    global targetDirectory
+    directoryName = ''
     urlReg = re.compile('/(.+?)/(.+?)/(.+?)/(.+)')
     urlTokens = (re.findall(urlReg, url))[0]
     for urlToken in urlTokens:
         directoryName = directoryName + '-' + urlToken
 
+    directoryName = targetDirectory + directoryName
     if os.path.exists(directoryName):
         print 'Directory:  ' + directoryName + ' exists, skiping...'
         return directoryName
@@ -64,11 +63,12 @@ def makeWorkDirectory(url, html):
         return directoryName
 
 def main():
+    global targetDirectory
     pagesCount = 0
-    logFileName = 'SpiderForBCY.com.url.log'
+    logFileName = targetDirectory + 'SpiderForBCY.com.url.log'
     logFile = open(logFileName, 'a')
     logFileReader = open(logFileName, 'r')
-    urlFileName = 'SpiderForBCY.com.Ranking.urls'
+    urlFileName = targetDirectory + 'SpiderForBCY.com.Ranking.urls'
     urlFile = open(urlFileName, 'r')
     socket.setdefaulttimeout(10)
 
@@ -76,14 +76,17 @@ def main():
     urlFile.close()
     
     finishedWorks = set(logFileReader.readlines())
-    print 'having finished urls count: %d' % len(finishedWorks)
+    logFileReader.close()
+    print 'Having finished urls count: %d' % len(finishedWorks)
 
     try:
         for work in allWorks:
             print 'Trying url: ' + work
             if work in finishedWorks:
-                print 'This url has been finished'
+                print 'This url has been finished, skiping...'
                 continue
+            
+            finishedWorks.add(work)
             workHtml = getWorkHTML(work)
             getWorkData(work, workHtml)
             logFile.write(work)

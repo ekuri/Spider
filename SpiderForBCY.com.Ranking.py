@@ -6,6 +6,8 @@ import os
 import time
 import sys
 
+targetDirectory = 'get/bcy/'
+
 def getCurrentDateTankingHTML(url):
     req = urllib2.Request(url, headers={ 'User-Agent': '' })
     html = urllib2.urlopen(req).read()
@@ -25,16 +27,17 @@ def getNextDateRankingUrl(html):
     return urls[0]
 
 def main():
+    global targetDirectory
     baseUrl = 'http://bcy.net/coser/'
     currentDateRankingUrl = 'toppost100?type=lastday&date=20150918'
-    logFileName = 'SpiderForBCY.com.Ranking.log'
+    logFileName = targetDirectory + 'SpiderForBCY.com.Ranking.log'
     logFile = open(logFileName, 'a')
-    urlsFileName = 'SpiderForBCY.com.Ranking.urls'
+    urlsFileName = targetDirectory + 'SpiderForBCY.com.Ranking.urls'
     urlsFile = open(urlsFileName, 'wb')
     allWorks = set()
     socket.setdefaulttimeout(10)
 
-    print 'Starting Spider...'
+    print 'Starting Spider for BCY...'
     while True:
         try:
                 debugString = 'Trying urls: ' + currentDateRankingUrl
@@ -53,8 +56,6 @@ def main():
         except KeyboardInterrupt:
             print 'keyboard Interrupt, exiting...'
             break
-        #except:
-        #        pass
 
     print 'Found totally %d works' % len(allWorks)
     for workUrl in allWorks:
