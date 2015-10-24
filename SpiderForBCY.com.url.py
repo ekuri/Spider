@@ -80,8 +80,8 @@ def main():
     logFileReader.close()
     print 'Having finished urls count: %d' % len(finishedWorks)
 
-    try:
-        for work in allWorks:
+    for work in allWorks:
+        try:
             print 'Trying url: ' + work
             if work in finishedWorks:
                 print 'This url has been finished, skiping...'
@@ -91,10 +91,11 @@ def main():
             workHtml = getWorkHTML(work)
             getWorkData(work, workHtml)
             logFile.write(work)
-    except KeyboardInterrupt:
-        print 'KeyboardInterrupt, exiting...'
-    except:
-        pass
+        except KeyboardInterrupt:
+            print 'KeyboardInterrupt, exiting...'
+            break
+        except:
+            continue
     logFile.close()
 
 if __name__ == "__main__":
