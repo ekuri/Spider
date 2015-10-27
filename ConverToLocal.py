@@ -15,7 +15,7 @@ def main(argv):
     fileLines = targetFileReader.readlines()
     targetFileReader.close()
 
-    targetFileWriter = open('test.log', 'wb')
+    targetFileWriter = open(argv[1], 'wb')
     for line in fileLines:
         print 'Writing: ' + line.strip()
         targetFileWriter.write(line.strip() + '\n')
