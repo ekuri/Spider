@@ -1,12 +1,6 @@
 import urllib2
-import urllib
 import socket
 import re
-import os
-import time
-import sys
-
-targetDirectory = 'get/bcy/'
 
 def getCurrentDateTankingHTML(url):
     req = urllib2.Request(url, headers={ 'User-Agent': '' })
@@ -14,7 +8,7 @@ def getCurrentDateTankingHTML(url):
     return html
 
 def getAllCurrentDateRankingWorkUrls(html):
-    worksReg = re.compile('<div class="work-thumbnail__ft center mt15 mb10">.+?<a href="(.+?)"', re.S)
+    worksReg = re.compile('"(/coser/detail/.+?)"')
     works = re.findall(worksReg, html)
     return works
 
@@ -26,29 +20,21 @@ def getNextDateRankingUrl(html):
         return ''
     return urls[0]
 
-def main():
-    global targetDirectory
-    baseUrl = 'http://bcy.net/coser/'
-    currentDateRankingUrl = 'toppost100?type=lastday&date=20150918'
-    logFileName = targetDirectory + 'SpiderForBCY.com.Ranking.log'
-    logFile = open(logFileName, 'a')
-    urlsFileName = targetDirectory + 'SpiderForBCY.com.Ranking.urls'
-    urlsFile = open(urlsFileName, 'wb')
-    allWorks = set()
+def run(database, baseUrl, currentDateRankingUrl):
     socket.setdefaulttimeout(10)
 
     print 'Starting Spider for BCY...'
     while True:
         try:
-                debugString = 'Trying urls: ' + currentDateRankingUrl
+                database.insert(currentDateRankingUrl, "date", "current")
+                print 'Trying urls: ' + baseUrl + currentDateRankingUrl
                 currentDateTankingHTML = getCurrentDateTankingHTML(baseUrl + currentDateRankingUrl)
-
                 allCurrentDateRankingWorkUrls = getAllCurrentDateRankingWorkUrls(currentDateTankingHTML)
-                
-                print debugString + (' ---> Found %d works' % len(allCurrentDateRankingWorkUrls))
-                logFile.write(debugString + '\n')
-                
-                allWorks |= set(allCurrentDateRankingWorkUrls)
+                print '---> Found %d works' % len(allCurrentDateRankingWorkUrls)
+                for work in allCurrentDateRankingWorkUrls:
+                    #print "found work: " + work
+                    database.insert(work, "work", "new")
+                database.updateStatus(currentDateRankingUrl, "done")
                 
                 currentDateRankingUrl = getNextDateRankingUrl(currentDateTankingHTML)
                 if (cmp(currentDateRankingUrl, '') == 0):
@@ -56,13 +42,3 @@ def main():
         except KeyboardInterrupt:
             print 'keyboard Interrupt, exiting...'
             break
-
-    print 'Found totally %d works' % len(allWorks)
-    for workUrl in allWorks:
-        urlsFile.write(workUrl + '\n')
-    
-    urlsFile.close()
-    logFile.close()
-
-if __name__ == "__main__":
-    sys.exit(int(main() or 0))

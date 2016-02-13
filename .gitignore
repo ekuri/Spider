@@ -1,4 +1,4 @@
-*.log
-*.urls
+*.pyc
 get
 test
+data/
