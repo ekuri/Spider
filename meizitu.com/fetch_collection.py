@@ -42,7 +42,7 @@ def get_collections(html):
 def get_next_page(html):
     next_page_reg = re.compile("<li><a href='(.+?)'>\xcf\xc2\xd2\xbb\xd2\xb3</a></li>")
     next_page = re.findall(next_page_reg, html)
-    if next_page[0]:
+    if (len(next_page) > 0):
         print 'Next page: ' + next_page[0]
         return next_page[0]
     return ''
