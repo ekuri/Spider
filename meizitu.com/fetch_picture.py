@@ -4,6 +4,7 @@ import time
 import sys
 import os
 import hashlib
+import traceback
 sys.path.append('.')
 from database.database import Database
 
@@ -29,6 +30,7 @@ while row:
         print filename
         picture_file = open(base_path + '/' + filename, 'wb')
         picture_file.write(picture_data)
+        picture_file.close()
 
         update_cursor.execute('update pictures set status = "%s", filename = "%s" where id = %d' % ('done', filename, row[0]))
         Database.commit()
@@ -38,8 +40,13 @@ while row:
         row = cursor.fetchone()
     except KeyboardInterrupt:
         break
+    except urllib2.HTTPError, e:
+        if e.code == 404:
+            print e
+            cursor.execute('select id, url from pictures where status = "%s"' % 'new')
+            row = cursor.fetchone()
     except BaseException, e:
-        print e
+        traceback.print_exc()
         time.sleep(1)
         pass
 
